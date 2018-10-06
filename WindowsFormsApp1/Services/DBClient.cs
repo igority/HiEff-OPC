@@ -16,8 +16,8 @@ namespace WindowsFormsApp1.Services
 
         IMongoClient _client;
         IMongoDatabase _database;
-        public List<TestOutput> testOutputs;
-        public List<TestInput> testInputs;
+        public List<PLCOutput> plcOutputs;
+        public List<PLCInput> plcInputs;
         Thread dbWriter;
         Thread dbReader;
         //SshClient client;
@@ -28,8 +28,8 @@ namespace WindowsFormsApp1.Services
         {
 
             ConnectToDB();
-            testInputs = GetTestInputs();
-            testOutputs = GetTestOutputs();
+            plcInputs = GetPLCInputs();
+            plcOutputs = GetPLCOutputs();
             // vendors =GetVendors();
 
             dbWriter = new Thread(dbWrite);
@@ -50,87 +50,106 @@ namespace WindowsFormsApp1.Services
 
         }
 
-        public List<TestInput> GetTestInputs()
+        public List<PLCInput> GetPLCInputs()
         {
-            List<TestInput> _testInputs = new List<TestInput>();
-            var collection = _database.GetCollection<BsonDocument>("Test-Input");
+            List<PLCInput> _plcInputs = new List<PLCInput>();
+            var collection = _database.GetCollection<BsonDocument>("PLC");
             var filter = new BsonDocument();
             var results = collection.Find(filter).Limit(100).ToList();
             if (results.Count > 0)
             {
                 foreach (var result in results)
                 {
-                    TestInput testInput = new TestInput(result);
-                    _testInputs.Add(testInput);
+                    PLCInput plcInput = new PLCInput(result);
+                    _plcInputs.Add(plcInput);
                 }
             }
-            return _testInputs;
+            return _plcInputs;
         }
 
-        public List<TestOutput> GetTestOutputs()
+        public List<PLCOutput> GetPLCOutputs()
         {
-            List<TestOutput> _testOutputs = new List<TestOutput>();
-            var collection = _database.GetCollection<BsonDocument>("Test-Output");
+            List<PLCOutput> _plcOutputs = new List<PLCOutput>();
+            var collection = _database.GetCollection<BsonDocument>("PLC");
             var filter = new BsonDocument();
             var results = collection.Find(filter).Limit(100).ToList();
             if (results.Count > 0)
             {
                 foreach (var result in results)
                 {
-                    TestOutput testOutput = new TestOutput(result);
-                    _testOutputs.Add(testOutput);
+                    PLCOutput plcOutput = new PLCOutput(result);
+                    _plcOutputs.Add(plcOutput);
                 }
             }
-            return _testOutputs;
+            return _plcOutputs;
         }
 
-        public void updateTestOutput(TestOutput testOutput)
+        public void updatePLCOutput(PLCOutput plcOutput)
         {
-            var collection = _database.GetCollection<BsonDocument>("Test-Output");
-            var filter = Builders<BsonDocument>.Filter.Eq("id", testOutput.id);
-            var update = Builders<BsonDocument>.Update.Set("output_bool", testOutput.output_bool).Set("output_int", testOutput.output_int).Set("output_random", testOutput.output_random);
+            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var filter = Builders<BsonDocument>.Filter.Eq("id", plcOutput.id);
+            var update = Builders<BsonDocument>.Update.Set("iPLC_STATUS", plcOutput.iPlc_Status);
+            //  .Set("output_int", testOutput.output_int)
+            //  .Set("output_random", testOutput.output_random);
             //var update = Builders<BsonDocument>.Update.Set("order_status", order.order_status);
             var result = collection.UpdateMany(filter, update);
         }
 
-        public void updateTestInput(TestInput testInput)
+        public void updatePLCInput(PLCInput plcInput)
         {
-            var collection = _database.GetCollection<BsonDocument>("Test-Input");
-            var filter = Builders<BsonDocument>.Filter.Eq("id", testInput.id);
-            var update = Builders<BsonDocument>.Update.Set("input_bool", testInput.input_bool).Set("input_int", testInput.input_int);
-            //var update = Builders<BsonDocument>.Update.Set("order_status", order.order_status);
-            var result = collection.UpdateMany(filter, update);
+            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var filter = Builders<BsonDocument>.Filter.Eq("id", plcInput.id);
+           // var update = Builders<BsonDocument>.Update.Set("iPLC_STATUS", plcInput.input_bool).Set("input_int", testInput.input_int);
+           // var result = collection.UpdateMany(filter, update);
         }
 
         void dbWrite()
         {
-            while (true)
+            try
             {
-                Thread.Sleep(200);
-                if (Workflow.testOutputs != null)
+                while (true)
                 {
-                    for (int i = 0; i < Workflow.testOutputs.Count; i++)
+                    Thread.Sleep(200);
+                    if (Workflow.plcOutputs != null)
                     {
-                        updateTestOutput(Workflow.testOutputs[i]);
+                        for (int i = 0; i < Workflow.plcOutputs.Count; i++)
+                        {
+                            updatePLCOutput(Workflow.plcOutputs[i]);
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
+
         }
 
         void dbRead()
         {
-            while (true)
+            try
             {
-                Thread.Sleep(200);
-                Workflow.testInputs = GetTestInputs();
-                //if (Workflow.testInputs != null)
-                //{
-                //    for (int i = 0; i < Workflow.testOutputs.Count; i++)
-                //    {
-                //        updateTestOutput(Workflow.testOutputs[i]);
-                //    }
-                //}
+                while (true)
+                {
+                    Thread.Sleep(200);
+                    Workflow.plcInputs = GetPLCInputs();
+                    //if (Workflow.testInputs != null)
+                    //{
+                    //    for (int i = 0; i < Workflow.testOutputs.Count; i++)
+                    //    {
+                    //        updateTestOutput(Workflow.testOutputs[i]);
+                    //    }
+                    //}
+                }
             }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
+         
         }
 
 

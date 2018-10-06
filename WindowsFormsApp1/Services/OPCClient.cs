@@ -15,10 +15,10 @@ namespace WindowsFormsApp1.Services
 {
     class OPCClient
     {
-        public TestInput CurrentTestInput { get; set; }
-        public TestOutput CurrentTestOutput { get; set; }
+        public PLCInput CurrentPLCInput { get; set; }
+        public PLCOutput CurrentPLCOutput { get; set; }
 
-        private TestInput previousTestInput = null;
+        private PLCInput previousPLCInput = null;
 
         OPCServer ObjOPCServer;
         OPCGroups ObjOPCGroups;
@@ -27,7 +27,7 @@ namespace WindowsFormsApp1.Services
 
         int NoOfItems;
         string _serverName;
-        public static int tagIndex;
+        public static int tagIndexWriter;
         public static int tagIndexReader;
 
         public static Array writerOPCItemIDs;
@@ -55,20 +55,13 @@ namespace WindowsFormsApp1.Services
         {
             Init();
             ConnectToOPC();
-            //AddTagsFromPLC();
-            //SetupOPCGroup("Group01");
-            //Reader = new Thread(() => ReadItems(ObjOPCGroup));
-            //Writer = new Thread(() => WriteItems(ObjOPCGroup));
-
-            //Reader.Start();
-            //Writer.Start();
         }
 
         void Init()
         {
             //SETUP VARIABLES
             stopThreads = false;
-            tagIndex = 1;
+            tagIndexWriter = 1;
             tagIndexReader = 1;
             NoOfItems = 10000;
 
@@ -104,25 +97,35 @@ namespace WindowsFormsApp1.Services
         {
             //tagIndex = 3; test
             //ADD TAGS FROM PLC TO OPC GROUP
-            //OPCItemIDs.SetValue("Bucket Brigade.Int1", 1);
-            //OPCItemIDs.SetValue("Bucket Brigade.Int2", 2);
-            //OPCItemIDs.SetValue("Bucket Brigade.Real1", 3);
-            //for (int i=1;i<=7700;i+=2)
-            //{
-            //    OPCItemIDs.SetValue("Bucket Brigade.Int1", i);
-            //    ItemServerWriteValues.SetValue(78, i);
-            //    OPCItemIDs.SetValue("Bucket Brigade.Int2", i+1);
-            //    ItemServerWriteValues.SetValue(93, i+1);
-            //}
-            //readerOPCItemIDs.SetValue("Bucket Brigade.UInt1", tagIndexReader++);
-            //readerOPCItemIDs.SetValue("Bucket Brigade.UInt2", tagIndexReader++);
-            readerOPCItemIDs.SetValue(Globals.INPUT_TAG_1_NAME, tagIndexReader++);  //test
-            readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_1_NAME, tagIndexReader++);  //test
-            readerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndexReader++);  //test
-            readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_2_NAME, tagIndexReader++);  //test
-            readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_3_NAME, tagIndexReader++);  //test
+            foreach (var input_tag in Globals.INPUT_TAGS)
+            {
+                readerOPCItemIDs.SetValue(input_tag, tagIndexReader++);
+            }
+
+            //readerOPCItemIDs.SetValue(Globals.INPUT_TAG_1_NAME, tagIndexReader++);  //test
+            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_1_NAME, tagIndexReader++);  //test
+            //readerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndexReader++);  //test
+            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_2_NAME, tagIndexReader++);  //test
+            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_3_NAME, tagIndexReader++);  //test
 
             // OPCItemIDs.SetValue("TCP CHANNEL>ISOTCP>DB100:BOOL:0.0", tagIndex++);
+
+        }
+
+
+        public void AddWriteGroupTags()
+        {
+
+            foreach (var output_tag in Globals.OUTPUT_TAGS)
+            {
+                 writerOPCItemIDs.SetValue(output_tag, tagIndexWriter++);
+            }
+            //TODO
+            // writerOPCItemIDs.SetValue(Globals.INPUT_TAGS, tagIndex++);  //test
+            // writerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndex++);  //test
+
+
+
 
         }
 
@@ -145,7 +148,7 @@ namespace WindowsFormsApp1.Services
             _ObjOPCGroup.UpdateRate = 200;
             _ObjOPCGroup.IsActive = true;
             _ObjOPCGroup.IsSubscribed = true;
-            _ObjOPCGroup.OPCItems.AddItems(tagIndex, ref writerOPCItemIDs, ref writerClientHandles, out writerItemServerHandles, out writerItemServerErrors, writerRequestedDataTypes, writerAccessPaths);
+            _ObjOPCGroup.OPCItems.AddItems(tagIndexWriter, ref writerOPCItemIDs, ref writerClientHandles, out writerItemServerHandles, out writerItemServerErrors, writerRequestedDataTypes, writerAccessPaths);
 
             //Array _ItemServerHandles=ItemServerHandles;
             //int itemsNum=0; //test
@@ -186,150 +189,106 @@ namespace WindowsFormsApp1.Services
 
         void ReadItems(OPCGroup ObjOPCGroup)
         {
-
             //READ ITEMS
             object qualities;
             object timestamp;
-
-            if (CurrentTestOutput == null) CurrentTestOutput = new TestOutput();
-
-            while (!stopThreads)
+            try
             {
-                //DA SE NAJDE DOBAR NACIN ZA CITANJE NA TAGOVITE SO SERVER HANDLES
-                ObjOPCGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, tagIndexReader - 1, ref readerItemServerHandles, out ItemServerReadValues, out readerItemServerErrors, out qualities, out timestamp);
-                string message = "";
-                for (int i = 1; i <= 5; i++)
+                if (CurrentPLCOutput == null) CurrentPLCOutput = new PLCOutput();
+
+                while (!stopThreads)
                 {
-                    switch (i)
+                    //DA SE NAJDE DOBAR NACIN ZA CITANJE NA TAGOVITE SO SERVER HANDLES
+                    ObjOPCGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, tagIndexReader - 1, ref readerItemServerHandles, out ItemServerReadValues, out readerItemServerErrors, out qualities, out timestamp);
+                    string message = "";
+                    for (int i = 1; i <= Globals.GetTotalNumberOfInputTags(); i++)
                     {
-                        case 2:
-                            CurrentTestOutput.output_bool = (bool)ItemServerReadValues.GetValue(i);
-                            break;
-                        case 4:
-                            CurrentTestOutput.output_int = (int)ItemServerReadValues.GetValue(i);
-                            break;
-                        case 5:
-                            CurrentTestOutput.output_random = (int)ItemServerReadValues.GetValue(i);
-                            break;
-                        default:
-                            break;
+                        switch (i)
+                        {
+                            case 1:
+                                CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);
+                                break;
+                            //case 2:
+                            //    CurrentTestOutput.output_bool = (bool)ItemServerReadValues.GetValue(i);
+                            //    break;
+                            //case 4:
+                            //    CurrentTestOutput.output_int = (int)ItemServerReadValues.GetValue(i);
+                            //    break;
+                            //case 5:
+                            //    CurrentTestOutput.output_random = (int)ItemServerReadValues.GetValue(i);
+                            //    break;
+                            default:
+                                break;
+                        }
+                        message = message + i.ToString() + ": " + ItemServerReadValues.GetValue(i).ToString() + "\t";
                     }
-                    message = message + i.ToString() + ": " + ItemServerReadValues.GetValue(i).ToString() + "\t";
-                }
 
-                //message = message + " " + ((Array)timestamp).GetValue(1).ToString() + " " + ((Array)timestamp).GetValue(2).ToString() + " " + ((Array)timestamp).GetValue(3).ToString();
-                Console.WriteLine(message);
-                //Workflow.LogMessage(message);
-                //UPDATE WORKFLOW.VENDORS.ROBOT.ORDER.STATUS with OPC STATUSES!!! np tests
-                //}
-                /*
-                foreach (Vendor vendor in Workflow.vendors)
-                {
-                    vendor.robot.test1 = ItemServerReadValues.GetValue(1).ToString();
-                    vendor.robot.test2 = ItemServerReadValues.GetValue(2).ToString();
-                    vendor.robot.test3 = ItemServerReadValues.GetValue(3).ToString();
-                }
-                */
+                    //message = message + " " + ((Array)timestamp).GetValue(1).ToString() + " " + ((Array)timestamp).GetValue(2).ToString() + " " + ((Array)timestamp).GetValue(3).ToString();
+                    Console.WriteLine(message);
+                    //Workflow.LogMessage(message);
+                    //UPDATE WORKFLOW.VENDORS.ROBOT.ORDER.STATUS with OPC STATUSES!!! np tests
+                    //}
+                    /*
+                    foreach (Vendor vendor in Workflow.vendors)
+                    {
+                        vendor.robot.test1 = ItemServerReadValues.GetValue(1).ToString();
+                        vendor.robot.test2 = ItemServerReadValues.GetValue(2).ToString();
+                        vendor.robot.test3 = ItemServerReadValues.GetValue(3).ToString();
+                    }
+                    */
 
-                System.Threading.Thread.Sleep(500);
+                    System.Threading.Thread.Sleep(500);
+                }
             }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
+
         }
 
         void WriteItems(OPCGroup ObjOPCGroup)
         {
-            while (!stopThreads)
+            try
             {
-               
-                if (Workflow.testInputs != null)
+                while (!stopThreads)
                 {
-                    CurrentTestInput = Workflow.testInputs.First();
-                    if (previousTestInput == null || previousTestInput != CurrentTestInput)
+
+                    if (Workflow.plcInputs != null)
                     {
-                       // ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 0);
-                        ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 1);
-                        ItemServerWriteValues.SetValue(CurrentTestInput.input_int, 2);
+                        CurrentPLCInput = Workflow.plcInputs.First();
+                        if (previousPLCInput == null || previousPLCInput != CurrentPLCInput)
+                        {
+                            ItemServerWriteValues.SetValue(CurrentPLCInput.iPlc_Status, 1);
+                            // ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 1);
+                            // ItemServerWriteValues.SetValue(CurrentTestInput.input_int, 2);
+                            try
+                            {
+                                ObjOPCGroup.SyncWrite(tagIndexWriter-1, ref writerItemServerHandles, ref ItemServerWriteValues, out writerItemServerErrors);
 
-                        ObjOPCGroup.SyncWrite(tagIndex - 1, ref writerItemServerHandles, ref ItemServerWriteValues, out writerItemServerErrors);
-                        previousTestInput = CurrentTestInput;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                throw;
+                            }
+                            previousPLCInput = CurrentPLCInput;
+                        }
                     }
+
+                    //ItemServerWriteValues.SetValue(1.1, Array.IndexOf(OPCItemIDs,(object)("Bucket Brigade.Real1")));
+                    System.Threading.Thread.Sleep(1000);
                 }
-
-                //ItemServerWriteValues.SetValue(1.1, Array.IndexOf(OPCItemIDs,(object)("Bucket Brigade.Real1")));
-                System.Threading.Thread.Sleep(1000);
             }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
+           
         }
 
 
-        public void AddWriteGroupTags()
-        {
-            //writerOPCItemIDs.SetValue("Bucket Brigade.Int1", tagIndex++);
-            //writerOPCItemIDs.SetValue("Bucket Brigade.Int2", tagIndex++);
-            writerOPCItemIDs.SetValue(Globals.INPUT_TAG_1_NAME, tagIndex++);  //test
-            writerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndex++);  //test
-            // writerOPCItemIDs.SetValue("AB:TESTCOMMS_DB_PLC:DINT:OPC_RANDOMOUTPUT.VALUE", tagIndex++);  //test
-
-            //for(int k=1;k<=5;k++)
-            //{
-            //    string name = "robot[" + k.ToString() + "].";
-
-            //    for (int i = 1; i <= 20; i++)
-            //    {
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]._id", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].userid", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].quantity", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].order_type", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].created_on", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].created_date", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].order_status", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].Payment", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].waiting_time", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].time", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].vendor_id", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].order_no", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].price", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].mode", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].drink_name", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].paymentinfo", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].glassid", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].categoryid", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "].productid", OPCClient.tagIndex++);
-
-            //        for (int j = 1; j <= 10; j++)
-            //        {
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "].id", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "].title", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "].measure_in", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "]._id", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "].time", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "ingredient[" + j.ToString() + "].quantity", OPCClient.tagIndex++);
-
-            //        }
-
-            //        for (int j = 1; j <= 10; j++)
-            //        {
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "garnish[" + j.ToString() + "].id", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "garnish[" + j.ToString() + "].title", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "garnish[" + j.ToString() + "].measure_in", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "garnish[" + j.ToString() + "]._id", OPCClient.tagIndex++);
-            //            OPCClient.OPCItemIDs.SetValue(name + "order[" + i.ToString() + "]." + "garnish[" + j.ToString() + "].quantity", OPCClient.tagIndex++);
-
-            //        }
-
-            //    }
-
-
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor._id", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.vendorno", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.have_orders", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.status", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.current_order_time", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.totaltime", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "vendor.title", OPCClient.tagIndex++);
-            //        OPCClient.OPCItemIDs.SetValue(name + "status", OPCClient.tagIndex++);
-
-            //}
-
-
-        }
     }
 }

@@ -15,8 +15,8 @@ namespace WindowsFormsApp1.Workers
         private bool running = false;
         DBClient dbClient;
         OPCClient opcClient;
-        public static List<TestInput> testInputs;
-        public static List<TestOutput> testOutputs;
+        public static List<PLCInput> plcInputs;
+        public static List<PLCOutput> plcOutputs;
         Thread Master;
 
         public Workflow(Form1 form1)
@@ -51,59 +51,34 @@ namespace WindowsFormsApp1.Workers
             dbClient = new DBClient();
             opcClient = new OPCClient();
 
-            opcClient.AddWriteGroupTags(); //test - uncomment in real application
+            opcClient.AddWriteGroupTags(); 
             opcClient.AddReadGroupTags();
 
             opcClient.writeGroup = opcClient.SetupOPCWriteGroup("WriteGroup");
             opcClient.readGroup = opcClient.SetupOPCReadGroup("ReadGroup");
 
-
-
-            //currentOrder = new List<Order>();
-            //currentOrder = dbClient.GetOrders();
         }
 
         void MainLoop()
         {
-            while (running)
+            try
             {
-                // DELAY THE LOOP FOR 300 ms
-                Thread.Sleep(100);
-                //List<Vendor> _vendors = new List<Vendor>(); ;
-                //CHECK IF ALL CONDITIONS ARE OK, IF NO - GO TO TOP OF LOOP
-                if (!checkConditions()) continue;
-                dbClient.updateTestOutput(opcClient.CurrentTestOutput);
-
-
-
-                //GET ALL VENDORS FROM DB
-                /*
-                if (vendors.Count == 0) { vendors = dbClient.GetVendors(); continue; }
-
-                _vendors = dbClient.GetVendors();
-                //UPDATE PLC WITH VENDORS
-                for (int i = 0; i < _vendors.Count;i++)
+                while (running)
                 {
-                    if (vendors[i].orderids.Count == 0) continue;
-                    //GET THE OLDEST PENDING ORDER FROM DB, IF NONE - GO TO TOP OF LOOP
-                    currentOrder = dbClient.GetOrders(_vendors[i]);
-                    if (currentOrder.Count == 0) continue;
+                    // DELAY THE LOOP FOR 300 ms
+                    Thread.Sleep(100);
 
-                    _vendors[i].robot.test1 = vendors[i].robot.test1;
-                    _vendors[i].robot.test2 = vendors[i].robot.test2;
-                    _vendors[i].robot.test3 = vendors[i].robot.test3;
-                    vendors[i] = _vendors[i];
-                    
-                    vendors[i].robot.order = currentOrder;
-                    vendors[i].updatePLC();
-
-                    
-
-                    //GIVE THE ORDER TO THE ROBOT - UPDATE OPC SERVER AND PLC
+                    //CHECK IF ALL CONDITIONS ARE OK, IF NO - GO TO TOP OF LOOP
+                    if (!checkConditions()) continue;
+                    // dbClient.updatePLCOutput(opcClient.CurrentPLCOutput);
                 }
-                */
-
             }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
+
         }
 
         bool checkConditions()

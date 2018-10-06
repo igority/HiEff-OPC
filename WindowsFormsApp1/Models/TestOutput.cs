@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1.Models
 {
-    class TestOutput
+    public class TestOutput
     {
         public ObjectId? id { get; set; }
         public bool? output_bool { get; set; }

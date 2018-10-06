@@ -9,7 +9,7 @@ using MongoDB.Driver;
 
 namespace WindowsFormsApp1.Models
 {
-    class TestInput
+    public class TestInput
     {
         public ObjectId id { get; set; }
         public bool input_bool { get; set; }

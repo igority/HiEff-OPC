@@ -66,6 +66,8 @@
   <ItemGroup>
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\ThreadHelper.cs" />
+    <Compile Include="Models\PLCInput.cs" />
+    <Compile Include="Models\PLCOutput.cs" />
     <Compile Include="Models\TestInput.cs" />
     <Compile Include="Models\TestOutput.cs" />
     <Compile Include="Services\DBClient.cs" />
