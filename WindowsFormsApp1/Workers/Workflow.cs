@@ -32,6 +32,8 @@ namespace WindowsFormsApp1.Workers
         public void Start_Process()
         {
             running = true;
+            plcInputs = new List<PLCInput>();
+            plcOutputs = new List<PLCOutput>();
             opcClient.startReader(opcClient.readGroup);
             opcClient.startWriter(opcClient.writeGroup);
             Master.Start();

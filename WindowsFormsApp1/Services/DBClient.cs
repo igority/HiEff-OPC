@@ -53,7 +53,7 @@ namespace WindowsFormsApp1.Services
         public List<PLCInput> GetPLCInputs()
         {
             List<PLCInput> _plcInputs = new List<PLCInput>();
-            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var collection = _database.GetCollection<BsonDocument>("PLC_inputs");
             var filter = new BsonDocument();
             var results = collection.Find(filter).Limit(100).ToList();
             if (results.Count > 0)
@@ -70,7 +70,7 @@ namespace WindowsFormsApp1.Services
         public List<PLCOutput> GetPLCOutputs()
         {
             List<PLCOutput> _plcOutputs = new List<PLCOutput>();
-            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var collection = _database.GetCollection<BsonDocument>("PLC_outputs");
             var filter = new BsonDocument();
             var results = collection.Find(filter).Limit(100).ToList();
             if (results.Count > 0)
@@ -86,7 +86,7 @@ namespace WindowsFormsApp1.Services
 
         public void updatePLCOutput(PLCOutput plcOutput)
         {
-            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var collection = _database.GetCollection<BsonDocument>("PLC_outputs");
             var filter = Builders<BsonDocument>.Filter.Eq("id", plcOutput.id);
             var update = Builders<BsonDocument>.Update.Set("iPLC_STATUS", plcOutput.iPlc_Status);
             //  .Set("output_int", testOutput.output_int)
@@ -97,7 +97,7 @@ namespace WindowsFormsApp1.Services
 
         public void updatePLCInput(PLCInput plcInput)
         {
-            var collection = _database.GetCollection<BsonDocument>("PLC");
+            var collection = _database.GetCollection<BsonDocument>("PLC_inputs");
             var filter = Builders<BsonDocument>.Filter.Eq("id", plcInput.id);
            // var update = Builders<BsonDocument>.Update.Set("iPLC_STATUS", plcInput.input_bool).Set("input_int", testInput.input_int);
            // var result = collection.UpdateMany(filter, update);

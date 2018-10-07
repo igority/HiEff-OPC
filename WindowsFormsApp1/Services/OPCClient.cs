@@ -220,6 +220,7 @@ namespace WindowsFormsApp1.Services
                             default:
                                 break;
                         }
+                        Workflow.plcOutputs.Add(CurrentPLCOutput);
                         message = message + i.ToString() + ": " + ItemServerReadValues.GetValue(i).ToString() + "\t";
                     }
 
@@ -236,6 +237,7 @@ namespace WindowsFormsApp1.Services
                         vendor.robot.test3 = ItemServerReadValues.GetValue(3).ToString();
                     }
                     */
+                   
 
                     System.Threading.Thread.Sleep(500);
                 }
@@ -255,10 +257,10 @@ namespace WindowsFormsApp1.Services
                 while (!stopThreads)
                 {
 
-                    if (Workflow.plcInputs != null)
+                    if (Workflow.plcInputs != null && Workflow.plcInputs.Count > 0)
                     {
                         CurrentPLCInput = Workflow.plcInputs.First();
-                        if (previousPLCInput == null || previousPLCInput != CurrentPLCInput)
+                        if (previousPLCInput == null || !previousPLCInput.Equals(CurrentPLCInput))
                         {
                             ItemServerWriteValues.SetValue(CurrentPLCInput.iPlc_Status, 1);
                             // ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 1);

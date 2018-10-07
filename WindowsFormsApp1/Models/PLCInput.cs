@@ -18,5 +18,12 @@ namespace WindowsFormsApp1.Models
             id = result["_id"].AsObjectId;
             iPlc_Status = result["iPLC_STATUS"].AsInt64;
         }
+
+        public bool Equals(PLCInput _plcInput)
+        {
+            if (this.iPlc_Status != _plcInput.iPlc_Status) return false;
+            //site ostanati vamu
+            return true;
+        }
     }
 }
