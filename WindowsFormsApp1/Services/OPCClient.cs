@@ -203,23 +203,28 @@ namespace WindowsFormsApp1.Services
                     string message = "";
                     for (int i = 1; i <= Globals.GetTotalNumberOfInputTags(); i++)
                     {
-                        switch (i)
-                        {
-                            case 1:
-                                CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);
-                                break;
-                            //case 2:
-                            //    CurrentTestOutput.output_bool = (bool)ItemServerReadValues.GetValue(i);
-                            //    break;
-                            //case 4:
-                            //    CurrentTestOutput.output_int = (int)ItemServerReadValues.GetValue(i);
-                            //    break;
-                            //case 5:
-                            //    CurrentTestOutput.output_random = (int)ItemServerReadValues.GetValue(i);
-                            //    break;
-                            default:
-                                break;
-                        }
+                        int index = Globals.OUTPUT_INDEXES.FirstOrDefault(x => x.Key == "iPLC_STATUS").Value;
+                        if (index == i) CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);
+
+                        //vaka i za drugite nadolu, nemoj so switch
+
+                        //switch (i)
+                        //{
+                        //    case CurrentPLCOutput.indexes.IndexOf("iPLC_STATUS"):
+                        //        CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);
+                        //        break;
+                        //    //case 2:
+                        //    //    CurrentTestOutput.output_bool = (bool)ItemServerReadValues.GetValue(i);
+                        //    //    break;
+                        //    //case 4:
+                        //    //    CurrentTestOutput.output_int = (int)ItemServerReadValues.GetValue(i);
+                        //    //    break;
+                        //    //case 5:
+                        //    //    CurrentTestOutput.output_random = (int)ItemServerReadValues.GetValue(i);
+                        //    //    break;
+                        //    default:
+                        //        break;
+                        //}
                         Workflow.plcOutputs.Add(CurrentPLCOutput);
                         message = message + i.ToString() + ": " + ItemServerReadValues.GetValue(i).ToString() + "\t";
                     }
@@ -262,7 +267,8 @@ namespace WindowsFormsApp1.Services
                         CurrentPLCInput = Workflow.plcInputs.First();
                         if (previousPLCInput == null || !previousPLCInput.Equals(CurrentPLCInput))
                         {
-                            ItemServerWriteValues.SetValue(CurrentPLCInput.iPlc_Status, 1);
+                            int index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "iPLC_STATUS").Value;
+                            ItemServerWriteValues.SetValue(CurrentPLCInput.iPlc_Status, index);
                             // ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 1);
                             // ItemServerWriteValues.SetValue(CurrentTestInput.input_int, 2);
                             try

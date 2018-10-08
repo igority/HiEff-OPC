@@ -13,6 +13,7 @@ namespace WindowsFormsApp1.Models
         public ObjectId id { get; set; }
         public long iPlc_Status { get; set; }
 
+
         public PLCInput(BsonDocument result)
         {
             id = result["_id"].AsObjectId;

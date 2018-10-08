@@ -32,11 +32,21 @@ namespace WindowsFormsApp1.Workers
         public void Start_Process()
         {
             running = true;
-            plcInputs = new List<PLCInput>();
-            plcOutputs = new List<PLCOutput>();
+            plcInputs = InitializePlcInputs();
+            plcOutputs = InitializePlcOutputs();
             opcClient.startReader(opcClient.readGroup);
             opcClient.startWriter(opcClient.writeGroup);
             Master.Start();
+        }
+
+        private List<PLCOutput> InitializePlcOutputs()
+        {
+            return new List<PLCOutput>();
+        }
+
+        private List<PLCInput> InitializePlcInputs()
+        {
+            return new List<PLCInput>();
         }
 
         public void Stop_Process()

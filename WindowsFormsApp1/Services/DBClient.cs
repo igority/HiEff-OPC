@@ -99,8 +99,6 @@ namespace WindowsFormsApp1.Services
         {
             var collection = _database.GetCollection<BsonDocument>("PLC_inputs");
             var filter = Builders<BsonDocument>.Filter.Eq("id", plcInput.id);
-           // var update = Builders<BsonDocument>.Update.Set("iPLC_STATUS", plcInput.input_bool).Set("input_int", testInput.input_int);
-           // var result = collection.UpdateMany(filter, update);
         }
 
         void dbWrite()
@@ -135,13 +133,6 @@ namespace WindowsFormsApp1.Services
                 {
                     Thread.Sleep(200);
                     Workflow.plcInputs = GetPLCInputs();
-                    //if (Workflow.testInputs != null)
-                    //{
-                    //    for (int i = 0; i < Workflow.testOutputs.Count; i++)
-                    //    {
-                    //        updateTestOutput(Workflow.testOutputs[i]);
-                    //    }
-                    //}
                 }
             }
             catch (Exception ex)

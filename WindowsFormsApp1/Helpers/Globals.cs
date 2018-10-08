@@ -15,6 +15,26 @@ namespace WindowsFormsApp1.Helpers
         public static string[] OUTPUT_TAGS = {
             "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 0 - PLC/iPLC_STATUS
         };
+        public static List<KeyValuePair<string, int>> INPUT_INDEXES
+        {
+            get
+            {
+                var _iNPUT_INDEXES = new List<KeyValuePair<string, int>>() {
+                new KeyValuePair<string, int>("iPLC_STATUS", 1),
+                //new KeyValuePair<string, int>("B", 2),                };
+                return _iNPUT_INDEXES;
+            }
+        }
+        public static List<KeyValuePair<string, int>> OUTPUT_INDEXES
+        {
+            get
+            {
+                var _oUTPUT_INDEXES = new List<KeyValuePair<string, int>>() {
+                new KeyValuePair<string, int>("iPLC_STATUS", 1),
+                //new KeyValuePair<string, int>("B", 2),                };
+                return _oUTPUT_INDEXES;
+            }
+        }
 
         internal static int GetTotalNumberOfInputTags()
         {
