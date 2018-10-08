@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace WindowsFormsApp1.Models
+namespace OPCtoMongoDBService.Models
 {
     public class TestInput
     {

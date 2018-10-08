@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Services;
+using OPCtoMongoDBService.Models;
+using OPCtoMongoDBService.Services;
 
-namespace WindowsFormsApp1.Workers
+namespace OPCtoMongoDBService.Workers
 {
     class Workflow
     {

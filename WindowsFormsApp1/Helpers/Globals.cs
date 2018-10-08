@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WindowsFormsApp1.Helpers
+namespace OPCtoMongoDBService.Helpers
 {
     public static class Globals
     {
@@ -21,7 +21,8 @@ namespace WindowsFormsApp1.Helpers
             {
                 var _iNPUT_INDEXES = new List<KeyValuePair<string, int>>() {
                 new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                //new KeyValuePair<string, int>("B", 2),                };
+                //new KeyValuePair<string, int>("B", 2),
+                };
                 return _iNPUT_INDEXES;
             }
         }
@@ -31,7 +32,8 @@ namespace WindowsFormsApp1.Helpers
             {
                 var _oUTPUT_INDEXES = new List<KeyValuePair<string, int>>() {
                 new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                //new KeyValuePair<string, int>("B", 2),                };
+                //new KeyValuePair<string, int>("B", 2),
+                };
                 return _oUTPUT_INDEXES;
             }
         }

@@ -6,7 +6,7 @@ using MongoDB.Driver;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WindowsFormsApp1.Models
+namespace OPCtoMongoDBService.Models
 {
     public class PLCOutput
     {

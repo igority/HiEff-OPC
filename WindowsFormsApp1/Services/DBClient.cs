@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Workers;
+using OPCtoMongoDBService.Models;
+using OPCtoMongoDBService.Workers;
 
-namespace WindowsFormsApp1.Services
+namespace OPCtoMongoDBService.Services
 {
     class DBClient
     {

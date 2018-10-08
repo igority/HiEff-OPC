@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1
+﻿namespace OPCtoMongoDBService
 {
     partial class Form1
     {

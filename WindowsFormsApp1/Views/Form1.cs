@@ -9,11 +9,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
-using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Services;
-using WindowsFormsApp1.Workers;
+using OPCtoMongoDBService.Models;
+using OPCtoMongoDBService.Services;
+using OPCtoMongoDBService.Workers;
 
-namespace WindowsFormsApp1
+namespace OPCtoMongoDBService
 {
 
     public partial class Form1 : Form

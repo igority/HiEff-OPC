@@ -7,11 +7,11 @@ using System.Threading;
 
 using OPCAutomation;
 using System.ComponentModel;
-using WindowsFormsApp1.Helpers;
-using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Workers;
+using OPCtoMongoDBService.Helpers;
+using OPCtoMongoDBService.Models;
+using OPCtoMongoDBService.Workers;
 
-namespace WindowsFormsApp1.Services
+namespace OPCtoMongoDBService.Services
 {
     class OPCClient
     {
