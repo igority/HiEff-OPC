@@ -24,6 +24,7 @@ namespace OPCtoMongoDBService
         public Form1()
         {
             InitializeComponent();
+            Helpers.Globals.SetUpTagsAndIndexes();
         }
 
         private void stop_button_Click(object sender, EventArgs e)

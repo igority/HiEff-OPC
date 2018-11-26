@@ -13,7 +13,7 @@ namespace OPCtoMongoDBService.Services
 {
     class DBClient
     {
-
+        private Order order;
         IMongoClient _client;
         IMongoDatabase _database;
         public List<PLCOutput> plcOutputs;
@@ -82,6 +82,32 @@ namespace OPCtoMongoDBService.Services
                 }
             }
             return _plcOutputs;
+        }
+
+        public Order GetCurrentOrder()
+        {
+            var collection = _database.GetCollection<BsonDocument>("Orders");
+            //TODO - implement filter here for unprocessed orders only!
+            var filter = new BsonDocument();
+            //db.products.find().sort({ "created_at": 1})
+            var results = collection.Find(filter).SortBy(bson => bson["creation_date"]).Limit(1).ToList();
+            if (results.Count > 0)
+            {
+                order = new Order(results.First());
+                return order;
+            } else
+            {
+                return null;
+            }
+        }
+
+        public void updateOrderStatus(int orderStatusOPC, int orderIdDb)
+        {
+            var collection = _database.GetCollection<BsonDocument>("Orders");
+            var filter = Builders<BsonDocument>.Filter.Eq("id", orderIdDb);
+            var update = Builders<BsonDocument>.Update.Set("status", orderStatusOPC);
+
+            var result = collection.UpdateOne(filter, update);
         }
 
         public void updatePLCOutput(PLCOutput plcOutput)

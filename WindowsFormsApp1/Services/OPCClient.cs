@@ -37,6 +37,7 @@ namespace OPCtoMongoDBService.Services
         Array writerRequestedDataTypes;
         Array writerAccessPaths;
         public static Array ItemServerWriteValues;
+        public static Array OrderServerWriteValues;
 
         public static Array readerOPCItemIDs;
         Array readerItemServerHandles;
@@ -72,6 +73,7 @@ namespace OPCtoMongoDBService.Services
             writerRequestedDataTypes = Array.CreateInstance(typeof(Int16), NoOfItems);
             writerAccessPaths = Array.CreateInstance(typeof(string), NoOfItems);
             ItemServerWriteValues = Array.CreateInstance(typeof(object), NoOfItems);
+            OrderServerWriteValues = Array.CreateInstance(typeof(object), NoOfItems);
 
             readerOPCItemIDs = Array.CreateInstance(typeof(string), NoOfItems);
             readerItemServerHandles = Array.CreateInstance(typeof(Int32), NoOfItems);
@@ -81,6 +83,69 @@ namespace OPCtoMongoDBService.Services
             readerAccessPaths = Array.CreateInstance(typeof(string), NoOfItems);
             ItemServerReadValues = Array.CreateInstance(typeof(string), NoOfItems);
 
+        }
+
+        public int GetCurrentOrderStatus()
+        {
+            return GetInt32Value("ORDER_STATUS");
+        }
+
+        public int GetCurrentOrderId()
+        {
+            return GetInt32Value("ORDER_ID");
+        }
+
+        private int GetInt32Value(string index_name)
+        {
+            object qualities;
+            object timestamp;
+            int return_value = 0;
+            //return 0;
+            ObjOPCGroups.GetOPCGroup("ReadGroup").SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice,
+                                                tagIndexReader - 1,
+                                                ref readerItemServerHandles,
+                                                out ItemServerReadValues,
+                                                out readerItemServerErrors,
+                                                out qualities,
+                                                out timestamp);
+            string message = "";
+            for (int i = 1; i <= Globals.GetTotalNumberOfOutputTags(); i++)
+            {
+                int index = Globals.OUTPUT_INDEXES.FirstOrDefault(x => x.Key == index_name).Value;
+                if (index == i) return_value = (int)ItemServerReadValues.GetValue(i);
+            }
+            return return_value;
+        }
+
+        public void writeNewOrder(Order order)
+        {
+            try
+            {
+
+                int index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "ORDER_ID").Value;
+                OrderServerWriteValues.SetValue(order.id, index);
+                //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "ORDER_STATUS").Value;
+                //ItemServerWriteValues.SetValue(order.status, index);
+                index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "TRAY_NUMBER").Value;
+                OrderServerWriteValues.SetValue(order.tray_number, index);
+                //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "QR_CODE").Value;
+                //OrderServerWriteValues.SetValue(order.qr_code, index);
+                try
+                {
+                    ObjOPCGroups.GetOPCGroup("WriteGroup").SyncWrite(tagIndexWriter - 1, ref writerItemServerHandles, ref OrderServerWriteValues, out writerItemServerErrors);
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                throw;
+            }
         }
 
         void ConnectToOPC()
@@ -97,36 +162,20 @@ namespace OPCtoMongoDBService.Services
         {
             //tagIndex = 3; test
             //ADD TAGS FROM PLC TO OPC GROUP
-            foreach (var input_tag in Globals.INPUT_TAGS)
+            foreach (var output_tag in Globals.OUTPUT_TAGS)
             {
-                readerOPCItemIDs.SetValue(input_tag, tagIndexReader++);
+                readerOPCItemIDs.SetValue(output_tag, tagIndexReader++);
             }
 
-            //readerOPCItemIDs.SetValue(Globals.INPUT_TAG_1_NAME, tagIndexReader++);  //test
-            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_1_NAME, tagIndexReader++);  //test
-            //readerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndexReader++);  //test
-            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_2_NAME, tagIndexReader++);  //test
-            //readerOPCItemIDs.SetValue(Globals.OUTPUT_TAG_3_NAME, tagIndexReader++);  //test
-
-            // OPCItemIDs.SetValue("TCP CHANNEL>ISOTCP>DB100:BOOL:0.0", tagIndex++);
-
         }
-
 
         public void AddWriteGroupTags()
         {
 
-            foreach (var output_tag in Globals.OUTPUT_TAGS)
+            foreach (var input_tag in Globals.INPUT_TAGS)
             {
-                 writerOPCItemIDs.SetValue(output_tag, tagIndexWriter++);
+                 writerOPCItemIDs.SetValue(input_tag, tagIndexWriter++);
             }
-            //TODO
-            // writerOPCItemIDs.SetValue(Globals.INPUT_TAGS, tagIndex++);  //test
-            // writerOPCItemIDs.SetValue(Globals.INPUT_TAG_2_NAME, tagIndex++);  //test
-
-
-
-
         }
 
         public OPCGroup SetupOPCReadGroup(string name)
@@ -199,9 +248,15 @@ namespace OPCtoMongoDBService.Services
                 while (!stopThreads)
                 {
                     //DA SE NAJDE DOBAR NACIN ZA CITANJE NA TAGOVITE SO SERVER HANDLES
-                    ObjOPCGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, tagIndexReader - 1, ref readerItemServerHandles, out ItemServerReadValues, out readerItemServerErrors, out qualities, out timestamp);
+                    ObjOPCGroup.SyncRead((short)OPCAutomation.OPCDataSource.OPCDevice, 
+                                    tagIndexReader - 1, 
+                                    ref readerItemServerHandles, 
+                                    out ItemServerReadValues, 
+                                    out readerItemServerErrors, 
+                                    out qualities, 
+                                    out timestamp);
                     string message = "";
-                    for (int i = 1; i <= Globals.GetTotalNumberOfInputTags(); i++)
+                    for (int i = 1; i <= Globals.GetTotalNumberOfOutputTags(); i++)
                     {
                         int index = Globals.OUTPUT_INDEXES.FirstOrDefault(x => x.Key == "iPLC_STATUS").Value;
                         if (index == i) CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);

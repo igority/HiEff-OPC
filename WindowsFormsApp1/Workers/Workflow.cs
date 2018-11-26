@@ -11,6 +11,7 @@ namespace OPCtoMongoDBService.Workers
 {
     class Workflow
     {
+        private bool IsBusy;
         private Form1 form1;
         private bool running = false;
         DBClient dbClient;
@@ -68,7 +69,6 @@ namespace OPCtoMongoDBService.Workers
 
             opcClient.writeGroup = opcClient.SetupOPCWriteGroup("WriteGroup");
             opcClient.readGroup = opcClient.SetupOPCReadGroup("ReadGroup");
-
         }
 
         void MainLoop()
@@ -77,12 +77,50 @@ namespace OPCtoMongoDBService.Workers
             {
                 while (running)
                 {
-                    // DELAY THE LOOP FOR 300 ms
+                    // DELAY THE LOOP FOR 100 ms
                     Thread.Sleep(100);
+                    if (IsBusy) break;
+                    IsBusy = true;
+                    Order order = dbClient.GetCurrentOrder();
+                    int orderIdDb = 0;
+                    if (order != null)  orderIdDb = order.id;
+                    int orderIdOPC = opcClient.GetCurrentOrderId();
 
+                    if (orderIdDb != 0)
+                    {
+                        //There is an order in the database
+                        if (orderIdOPC != 0)
+                        {
+                            //OPC has been processing an order.
+                            //compare if it is the same order in queue. 
+                            if (orderIdDb == orderIdOPC)
+                            {
+                                //Update status from opc to db
+                                int orderStatusOPC = opcClient.GetCurrentOrderStatus();
+                                dbClient.updateOrderStatus(orderStatusOPC, orderIdDb);
+                            } else
+                            {
+                                //this order has been completed. Update OPC with a new order
+                                opcClient.writeNewOrder(order);
+                            }
+                        } else 
+                        {
+                            //OPC is not processing any orders.
+                            //TODO - Update OPC with a new order
+                            opcClient.writeNewOrder(order);
+                        }
+                    } else
+                    {
+                        //no orders in queue. Do nothing
+                    }
+
+
+                    IsBusy = false;
                     //CHECK IF ALL CONDITIONS ARE OK, IF NO - GO TO TOP OF LOOP
                     if (!checkConditions()) continue;
+
                     // dbClient.updatePLCOutput(opcClient.CurrentPLCOutput);
+
                 }
             }
             catch (Exception ex)

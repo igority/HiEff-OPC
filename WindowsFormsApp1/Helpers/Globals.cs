@@ -8,33 +8,24 @@ namespace OPCtoMongoDBService.Helpers
 {
     public static class Globals
     {
+        private static List<KeyValuePair<string, int>> _INPUT_INDEXES;
+        private static List<KeyValuePair<string, int>> _OUTPUT_INDEXES;
+
         public static string OPC_SERVER_NAME = "Matrikon.OPC.AllenBradleyPLCs.1";
-        public static string[] INPUT_TAGS = {
-            "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 0 - PLC/iPLC_STATUS
-        };
-        public static string[] OUTPUT_TAGS = {
-            "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 0 - PLC/iPLC_STATUS
-        };
+        public static string[] INPUT_TAGS;
         public static List<KeyValuePair<string, int>> INPUT_INDEXES
         {
             get
             {
-                var _iNPUT_INDEXES = new List<KeyValuePair<string, int>>() {
-                new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                //new KeyValuePair<string, int>("B", 2),
-                };
-                return _iNPUT_INDEXES;
+                return _INPUT_INDEXES;
             }
         }
+        public static string[] OUTPUT_TAGS;
         public static List<KeyValuePair<string, int>> OUTPUT_INDEXES
         {
             get
             {
-                var _oUTPUT_INDEXES = new List<KeyValuePair<string, int>>() {
-                new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                //new KeyValuePair<string, int>("B", 2),
-                };
-                return _oUTPUT_INDEXES;
+                return _OUTPUT_INDEXES;
             }
         }
 
@@ -52,10 +43,36 @@ namespace OPCtoMongoDBService.Helpers
             return tagsNumber;
         }
 
-        //public static string INPUT_TAG_1_NAME = "AB:TESTCOMMS_DB_PLC:BOOL:OPC_INPUT_BOOL.VALUE";
-        //public static string INPUT_TAG_2_NAME = "AB:TESTCOMMS_DB_PLC:DINT:OPC_INPUT_INT.VALUE";
-        //public static string OUTPUT_TAG_1_NAME = "AB:TESTCOMMS_DB_PLC:BOOL:OPC_OUTPUT_BOOL.VALUE";
-        //public static string OUTPUT_TAG_2_NAME = "AB:TESTCOMMS_DB_PLC:DINT:OPC_OUTPUT_INT.VALUE";
-        //public static string OUTPUT_TAG_3_NAME = "AB:TESTCOMMS_DB_PLC:DINT:OPC_RANDOMOUTPUT.VALUE";
+        public static void SetUpTagsAndIndexes()
+        {
+             string[] _INPUT_TAGS = {
+            "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 1 - PLC/iPLC_STATUS
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE",      // 2 - ORDER/ID
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE",      // 3 - ORDER/STATUS
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ITRAY_NUMBER.VALUE",      // 4 - ORDER/TRAY_NUMBER
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.IQR_CODE.VALUE",      // 5 - ORDER/QR_CODE
+        };
+            _INPUT_INDEXES = new List<KeyValuePair<string, int>>()
+            {
+                new KeyValuePair<string, int>("iPLC_STATUS", 1),
+                new KeyValuePair<string, int>("ORDER_ID", 2),
+                new KeyValuePair<string, int>("ORDER_STATUS", 3),
+                new KeyValuePair<string, int>("TRAY_NUMBER", 4),
+                new KeyValuePair<string, int>("QR_CODE", 5),
+            };
+            string[] _OUTPUT_TAGS = {
+                "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 1 - PLC/iPLC_STATUS
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE",      // 2 - ORDER/ID
+            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE",      // 3 - ORDER/STATUS
+        };
+            _OUTPUT_INDEXES = new List<KeyValuePair<string, int>>() {
+                new KeyValuePair<string, int>("iPLC_STATUS", 1),
+                new KeyValuePair<string, int>("ORDER_ID", 2),
+                new KeyValuePair<string, int>("ORDER_STATUS", 3),
+                };
+
+            INPUT_TAGS = _INPUT_TAGS;
+            OUTPUT_TAGS = _OUTPUT_TAGS;
+        }
     }
 }
