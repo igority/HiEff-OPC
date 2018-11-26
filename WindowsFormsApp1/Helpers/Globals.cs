@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OPCtoMongoDBService.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,26 +9,9 @@ namespace OPCtoMongoDBService.Helpers
 {
     public static class Globals
     {
-        private static List<KeyValuePair<string, int>> _INPUT_INDEXES;
-        private static List<KeyValuePair<string, int>> _OUTPUT_INDEXES;
-
         public static string OPC_SERVER_NAME = "Matrikon.OPC.AllenBradleyPLCs.1";
-        public static string[] INPUT_TAGS;
-        public static List<KeyValuePair<string, int>> INPUT_INDEXES
-        {
-            get
-            {
-                return _INPUT_INDEXES;
-            }
-        }
-        public static string[] OUTPUT_TAGS;
-        public static List<KeyValuePair<string, int>> OUTPUT_INDEXES
-        {
-            get
-            {
-                return _OUTPUT_INDEXES;
-            }
-        }
+        public static List<Tag> INPUT_TAGS;
+        public static List<Tag> OUTPUT_TAGS;
 
         internal static int GetTotalNumberOfInputTags()
         {
@@ -45,34 +29,62 @@ namespace OPCtoMongoDBService.Helpers
 
         public static void SetUpTagsAndIndexes()
         {
-             string[] _INPUT_TAGS = {
-            "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 1 - PLC/iPLC_STATUS
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE",      // 2 - ORDER/ID
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE",      // 3 - ORDER/STATUS
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ITRAY_NUMBER.VALUE",      // 4 - ORDER/TRAY_NUMBER
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.IQR_CODE.VALUE",      // 5 - ORDER/QR_CODE
-        };
-            _INPUT_INDEXES = new List<KeyValuePair<string, int>>()
-            {
-                new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                new KeyValuePair<string, int>("ORDER_ID", 2),
-                new KeyValuePair<string, int>("ORDER_STATUS", 3),
-                new KeyValuePair<string, int>("TRAY_NUMBER", 4),
-                new KeyValuePair<string, int>("QR_CODE", 5),
-            };
-            string[] _OUTPUT_TAGS = {
-                "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE",           // 1 - PLC/iPLC_STATUS
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE",      // 2 - ORDER/ID
-            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE",      // 3 - ORDER/STATUS
-        };
-            _OUTPUT_INDEXES = new List<KeyValuePair<string, int>>() {
-                new KeyValuePair<string, int>("iPLC_STATUS", 1),
-                new KeyValuePair<string, int>("ORDER_ID", 2),
-                new KeyValuePair<string, int>("ORDER_STATUS", 3),
-                };
+            int index = 0;
+            INPUT_TAGS = new List<Tag>();
+            INPUT_TAGS.Add(new Tag(++index, "iPLC_STATUS", "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE"));
+            INPUT_TAGS.Add(new Tag(++index, "ORDER_ID", "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE"));
+            INPUT_TAGS.Add(new Tag(++index, "ORDER_STATUS", "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE"));
+            INPUT_TAGS.Add(new Tag(++index, "TRAY_NUMBER", "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ITRAY_NUMBER.VALUE"));
+            INPUT_TAGS.Add(new Tag(++index, "QR_CODE", "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.IQR_CODE.VALUE"));
 
-            INPUT_TAGS = _INPUT_TAGS;
-            OUTPUT_TAGS = _OUTPUT_TAGS;
+            int totalDrinks = 4;
+            int totalGarnishes = 3;
+            int totalIngredients = 8;
+            for (int drinkIndex = 1; drinkIndex <= totalDrinks; drinkIndex++)
+            {
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_ID",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ID.VALUE"));
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_ICE",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IICE.VALUE"));
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_PREP", 
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IPREP.VALUE"));
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_QUANTITY", 
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IQUANTITY.VALUE"));
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_STATUS", 
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ISTATUS.VALUE"));
+
+                for (int garnishIndex = 1; garnishIndex <= totalGarnishes; garnishIndex++)
+                {
+                    INPUT_TAGS.Add(new Tag(++index, "GARNISH_ID",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGARNISH_" + garnishIndex + ".ID.VALUE"));
+                    INPUT_TAGS.Add(new Tag(++index, "GARNISH_RATIO",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGARNISH_" + garnishIndex + ".RATIO.VALUE"));
+                }
+
+                INPUT_TAGS.Add(new Tag(++index, "GLASS_ID",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGLASS.ID.VALUE"));
+                INPUT_TAGS.Add(new Tag(++index, "GLASS_STATUS",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGLASS.ISTATUS.VALUE"));
+
+                for (int ingredientIndex = 1; ingredientIndex <= totalIngredients; ingredientIndex++)
+                {
+                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_ID",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".ID.VALUE"));
+                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_PLACE_NO",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".IPLACENUMBER.VALUE"));
+                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_UNIT",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".IUNIT.VALUE"));
+                }
+            }
+
+            index = 0;
+            OUTPUT_TAGS = new List<Tag>();
+            OUTPUT_TAGS.Add(new Tag(++index, "iPLC_STATUS",
+                        "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE"));
+            //OUTPUT_TAGS.Add(new Tag(++index, "ORDER_ID",
+            //            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE"));
+            //OUTPUT_TAGS.Add(new Tag(++index, "ORDER_STATUS",
+            //            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE"));
         }
     }
 }

@@ -111,7 +111,7 @@ namespace OPCtoMongoDBService.Services
             string message = "";
             for (int i = 1; i <= Globals.GetTotalNumberOfOutputTags(); i++)
             {
-                int index = Globals.OUTPUT_INDEXES.FirstOrDefault(x => x.Key == index_name).Value;
+                int index = Globals.OUTPUT_TAGS.FirstOrDefault(x => x.Name == index_name).Index;
                 if (index == i) return_value = (int)ItemServerReadValues.GetValue(i);
             }
             return return_value;
@@ -122,11 +122,11 @@ namespace OPCtoMongoDBService.Services
             try
             {
 
-                int index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "ORDER_ID").Value;
+                int index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "ORDER_ID").Index;
                 OrderServerWriteValues.SetValue(order.id, index);
                 //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "ORDER_STATUS").Value;
                 //ItemServerWriteValues.SetValue(order.status, index);
-                index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "TRAY_NUMBER").Value;
+                index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "TRAY_NUMBER").Index;
                 OrderServerWriteValues.SetValue(order.tray_number, index);
                 //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "QR_CODE").Value;
                 //OrderServerWriteValues.SetValue(order.qr_code, index);
@@ -164,7 +164,7 @@ namespace OPCtoMongoDBService.Services
             //ADD TAGS FROM PLC TO OPC GROUP
             foreach (var output_tag in Globals.OUTPUT_TAGS)
             {
-                readerOPCItemIDs.SetValue(output_tag, tagIndexReader++);
+                readerOPCItemIDs.SetValue(output_tag.Value, tagIndexReader++);
             }
 
         }
@@ -174,7 +174,7 @@ namespace OPCtoMongoDBService.Services
 
             foreach (var input_tag in Globals.INPUT_TAGS)
             {
-                 writerOPCItemIDs.SetValue(input_tag, tagIndexWriter++);
+                 writerOPCItemIDs.SetValue(input_tag.Value, tagIndexWriter++);
             }
         }
 
@@ -186,7 +186,13 @@ namespace OPCtoMongoDBService.Services
             _ObjOPCGroup.UpdateRate = 200;
             _ObjOPCGroup.IsActive = true;
             _ObjOPCGroup.IsSubscribed = true;
-            _ObjOPCGroup.OPCItems.AddItems(tagIndexReader - 1, ref readerOPCItemIDs, ref readerClientHandles, out readerItemServerHandles, out readerItemServerErrors, readerRequestedDataTypes, readerAccessPaths);
+            _ObjOPCGroup.OPCItems.AddItems(tagIndexReader - 1, 
+                                           ref readerOPCItemIDs, 
+                                           ref readerClientHandles, 
+                                           out readerItemServerHandles, 
+                                           out readerItemServerErrors, 
+                                           readerRequestedDataTypes, 
+                                           readerAccessPaths);
             return _ObjOPCGroup;
         }
 
@@ -258,7 +264,7 @@ namespace OPCtoMongoDBService.Services
                     string message = "";
                     for (int i = 1; i <= Globals.GetTotalNumberOfOutputTags(); i++)
                     {
-                        int index = Globals.OUTPUT_INDEXES.FirstOrDefault(x => x.Key == "iPLC_STATUS").Value;
+                        int index = Globals.OUTPUT_TAGS.FirstOrDefault(x => x.Name == "iPLC_STATUS").Index;
                         if (index == i) CurrentPLCOutput.iPlc_Status = (int)ItemServerReadValues.GetValue(i);
 
                         //vaka i za drugite nadolu, nemoj so switch
@@ -322,7 +328,7 @@ namespace OPCtoMongoDBService.Services
                         CurrentPLCInput = Workflow.plcInputs.First();
                         if (previousPLCInput == null || !previousPLCInput.Equals(CurrentPLCInput))
                         {
-                            int index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "iPLC_STATUS").Value;
+                            int index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "iPLC_STATUS").Index;
                             ItemServerWriteValues.SetValue(CurrentPLCInput.iPlc_Status, index);
                             // ItemServerWriteValues.SetValue(CurrentTestInput.input_bool, 1);
                             // ItemServerWriteValues.SetValue(CurrentTestInput.input_int, 2);

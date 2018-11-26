@@ -17,6 +17,7 @@ namespace OPCtoMongoDBService.Models
         public int ice { get; set; }
         public List<string> garnishes { get; set; }
         public int quantity { get; set; }
+        public int status { get; set; }
 
 
 
