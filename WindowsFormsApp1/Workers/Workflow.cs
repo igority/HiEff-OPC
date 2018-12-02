@@ -83,7 +83,7 @@ namespace OPCtoMongoDBService.Workers
                     IsBusy = true;
                     Order order = dbClient.GetCurrentOrder();
                     int orderIdDb = 0;
-                    if (order != null)  orderIdDb = order.id;
+                    if (order != null)  orderIdDb = (int)order.id;
                     int orderIdOPC = opcClient.GetCurrentOrderId();
 
                     if (orderIdDb != 0)
@@ -126,7 +126,7 @@ namespace OPCtoMongoDBService.Workers
             catch (Exception ex)
             {
                 Console.Write(ex.Message);
-                throw;
+                //throw;
             }
 
         }

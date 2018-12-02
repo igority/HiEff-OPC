@@ -88,11 +88,24 @@ namespace OPCtoMongoDBService.Services
         {
             var collection = _database.GetCollection<BsonDocument>("Orders");
             //TODO - implement filter here for unprocessed orders only!
-            var filter = new BsonDocument();
+            var filter = new BsonDocument("status", new BsonDocument("$ne", 20));
+
             //db.products.find().sort({ "created_at": 1})
-            var results = collection.Find(filter).SortBy(bson => bson["creation_date"]).Limit(1).ToList();
+            var results = collection.Find(filter).SortBy(bson => bson["creation_date"]).Limit(100).ToList();
             if (results.Count > 0)
             {
+                foreach (var result in results)
+                {
+                    try
+                    {
+                        order = new Order(result);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }    
+                }
                 order = new Order(results.First());
                 return order;
             } else
