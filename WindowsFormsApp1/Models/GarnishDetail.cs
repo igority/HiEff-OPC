@@ -8,16 +8,14 @@ using System.Threading.Tasks;
 
 namespace OPCtoMongoDBService.Models
 {
-    public class Glass
+    public class GarnishDetail
     {
-        public int id { get; set; }
-        public int status { get; set; }
+        public int? id { get; set; }
+        public int? place_number { get; set; }
 
-        public Glass(BsonDocument result)
+        public GarnishDetail(BsonDocument result)
         {
-            id = result["id"].AsInt32;
-            status = result["status"].AsInt32;
-
+            id = result["id"].AsNullableInt32;
         }
 
     }

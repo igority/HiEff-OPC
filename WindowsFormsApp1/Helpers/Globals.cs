@@ -42,37 +42,37 @@ namespace OPCtoMongoDBService.Helpers
             int totalIngredients = 8;
             for (int drinkIndex = 1; drinkIndex <= totalDrinks; drinkIndex++)
             {
-                INPUT_TAGS.Add(new Tag(++index, "DRINK_ID",
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_ID",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ID.VALUE"));
-                INPUT_TAGS.Add(new Tag(++index, "DRINK_ICE",
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_ICE",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IICE.VALUE"));
-                INPUT_TAGS.Add(new Tag(++index, "DRINK_PREP", 
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_PREP",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IPREP.VALUE"));
-                INPUT_TAGS.Add(new Tag(++index, "DRINK_QUANTITY", 
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_QUANTITY",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IQUANTITY.VALUE"));
-                INPUT_TAGS.Add(new Tag(++index, "DRINK_STATUS", 
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_STATUS",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ISTATUS.VALUE"));
 
                 for (int garnishIndex = 1; garnishIndex <= totalGarnishes; garnishIndex++)
                 {
-                    INPUT_TAGS.Add(new Tag(++index, "GARNISH_ID",
+                    INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_GARNISH_" + garnishIndex + "_ID",
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGARNISH_" + garnishIndex + ".ID.VALUE"));
-                    INPUT_TAGS.Add(new Tag(++index, "GARNISH_RATIO",
-                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGARNISH_" + garnishIndex + ".RATIO.VALUE"));
+                    INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_GARNISH_" + garnishIndex + "_RATIO",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGARNISH_" + garnishIndex + ".IRATIO.VALUE"));
                 }
 
-                INPUT_TAGS.Add(new Tag(++index, "GLASS_ID",
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_GLASS_ID",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGLASS.ID.VALUE"));
-                INPUT_TAGS.Add(new Tag(++index, "GLASS_STATUS",
+                INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_GLASS_STATUS",
                     "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STGLASS.ISTATUS.VALUE"));
 
                 for (int ingredientIndex = 1; ingredientIndex <= totalIngredients; ingredientIndex++)
                 {
-                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_ID",
+                    INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_INGREDIENT_" + ingredientIndex + "_ID",
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".ID.VALUE"));
-                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_PLACE_NO",
+                    INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_INGREDIENT_" + ingredientIndex + "_PLACE_NO",
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".IPLACENUMBER.VALUE"));
-                    INPUT_TAGS.Add(new Tag(++index, "INGREDIENT_UNIT",
+                    INPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_INGREDIENT_" + ingredientIndex + "_UNIT",
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".STINGREDINET_" + ingredientIndex + ".IUNIT.VALUE"));
                 }
             }
@@ -81,10 +81,10 @@ namespace OPCtoMongoDBService.Helpers
             OUTPUT_TAGS = new List<Tag>();
             OUTPUT_TAGS.Add(new Tag(++index, "iPLC_STATUS",
                         "AB:RYAN_HIEFFICIENCYBAR:DINT:IPLC_STATUS.VALUE"));
-            //OUTPUT_TAGS.Add(new Tag(++index, "ORDER_ID",
-            //            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE"));
-            //OUTPUT_TAGS.Add(new Tag(++index, "ORDER_STATUS",
-            //            "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE"));
+            OUTPUT_TAGS.Add(new Tag(++index, "ORDER_ID",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE"));
+            OUTPUT_TAGS.Add(new Tag(++index, "ORDER_STATUS",
+                        "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE"));
         }
     }
 }

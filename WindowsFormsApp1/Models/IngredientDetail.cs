@@ -10,15 +10,13 @@ namespace OPCtoMongoDBService.Models
 {
     public class IngredientDetail
     {
-        public int id { get; set; }
-        public int place_number { get; set; }
+        public int? id { get; set; }
+        public int? place_number { get; set; }
 
         public IngredientDetail(BsonDocument result)
         {
-            //_id = result["_id"].AsObjectId;
-            //id = result["id"].AsInt32;
-            ////creation_date = new BsonDateTime(result["creation_date"]);
-            //creation_date = DateTime.Parse(result["creation_date"].ToString());
+            id = result["id"].AsNullableInt32;
+            place_number = result["place_number"].AsNullableInt32;
         }
 
     }

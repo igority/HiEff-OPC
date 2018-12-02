@@ -124,15 +124,76 @@ namespace OPCtoMongoDBService.Services
 
                 int index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "ORDER_ID").Index;
                 OrderServerWriteValues.SetValue(order.id, index);
-                //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "ORDER_STATUS").Value;
-                //ItemServerWriteValues.SetValue(order.status, index);
+                index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "ORDER_STATUS").Index;
+                OrderServerWriteValues.SetValue(order.status, index);
                 index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "TRAY_NUMBER").Index;
                 OrderServerWriteValues.SetValue(order.tray_number, index);
-                //index = Globals.INPUT_INDEXES.FirstOrDefault(x => x.Key == "QR_CODE").Value;
+
+                if (order.products != null)
+                {
+                    try
+                    {
+                        int productIndex = 1;
+                        foreach (Product product in order.products)
+                        {
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_ID").Index;
+                            OrderServerWriteValues.SetValue(product.id, index);
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_ICE").Index;
+                            OrderServerWriteValues.SetValue(product.ice, index);
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_PREP").Index;
+                            OrderServerWriteValues.SetValue(product.drink.prep, index);
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_QUANTITY").Index;
+                            OrderServerWriteValues.SetValue(product.quantity, index);
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_STATUS").Index;
+                            OrderServerWriteValues.SetValue(product.quantity, index);
+
+                            if (product.garnishes != null) {
+                                int garnishIndex = 1;
+                                foreach (Garnish garnish in product.garnishes)
+                                {
+                                    index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_GARNISH_" + garnishIndex + "_ID").Index;
+                                    OrderServerWriteValues.SetValue(garnish.id, index);
+                                    index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_GARNISH_" + garnishIndex + "_RATIO").Index;
+                                    OrderServerWriteValues.SetValue(garnish.ratio, index);
+                                    garnishIndex++;
+                                }
+                            }
+
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_GLASS_ID").Index;
+                            OrderServerWriteValues.SetValue(product.drink.glass.id, index);
+                            index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_GLASS_STATUS").Index;
+                            OrderServerWriteValues.SetValue(product.drink.glass.status, index);
+
+                            int ingredientIndex = 1;
+                            foreach (Ingredient ingredient in product.drink.ingredients)
+                            {
+                                index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_INGREDIENT_" + ingredientIndex + "_ID").Index;
+                                OrderServerWriteValues.SetValue(ingredient.ingredientDetail.id, index);
+                                index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_INGREDIENT_" + ingredientIndex + "_PLACE_NO").Index;
+                                OrderServerWriteValues.SetValue(ingredient.ingredientDetail.place_number, index);
+                                index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "DRINK_" + productIndex + "_INGREDIENT_" + ingredientIndex + "_UNIT").Index;
+                                OrderServerWriteValues.SetValue(ingredient.ratio_ml, index);
+                                ingredientIndex++;
+                            }
+                            productIndex++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw new Exception("Error filling up indices for tags: " + ex);
+                    }
+
+                }
+                //index = Globals.INPUT_TAGS.FirstOrDefault(x => x.Name == "QR_CODE").Index;
                 //OrderServerWriteValues.SetValue(order.qr_code, index);
+
                 try
                 {
-                    ObjOPCGroups.GetOPCGroup("WriteGroup").SyncWrite(tagIndexWriter - 1, ref writerItemServerHandles, ref OrderServerWriteValues, out writerItemServerErrors);
+                    ObjOPCGroups.GetOPCGroup("WriteGroup").SyncWrite(tagIndexWriter - 1, 
+                        ref writerItemServerHandles, 
+                        ref OrderServerWriteValues, 
+                        out writerItemServerErrors);
 
                 }
                 catch (Exception ex)

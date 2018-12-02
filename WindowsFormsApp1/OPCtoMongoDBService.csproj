@@ -66,15 +66,17 @@
   <ItemGroup>
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\ThreadHelper.cs" />
+    <Compile Include="Models\Garnish.cs" />
+    <Compile Include="Models\GarnishDetail.cs" />
     <Compile Include="Models\IngredientDetail.cs" />
     <Compile Include="Models\Ingredient.cs" />
     <Compile Include="Models\Glass.cs" />
     <Compile Include="Models\Drink.cs" />
-    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\PLCInput.cs" />
     <Compile Include="Models\PLCOutput.cs" />
+    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\TestInput.cs" />
     <Compile Include="Models\TestOutput.cs" />
     <Compile Include="Services\DBClient.cs" />
