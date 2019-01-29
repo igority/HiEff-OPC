@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using OPCtoMongoDBService.Models;
 using OPCtoMongoDBService.Services;
+using WindowsFormsApp1.Services;
 
 namespace OPCtoMongoDBService.Workers
 {
@@ -81,9 +83,9 @@ namespace OPCtoMongoDBService.Workers
                     Thread.Sleep(100);
                     if (IsBusy) break;
                     IsBusy = true;
-                    Order order = dbClient.GetCurrentOrder();
+                    Order orderDb = dbClient.GetCurrentOrder();
                     int orderIdDb = 0;
-                    if (order != null)  orderIdDb = (int)order.id;
+                    if (orderDb != null)  orderIdDb = (int)orderDb.id;
                     int orderIdOPC = opcClient.GetCurrentOrderId();
 
                     if (orderIdDb != 0)
@@ -95,19 +97,44 @@ namespace OPCtoMongoDBService.Workers
                             //compare if it is the same order in queue. 
                             if (orderIdDb == orderIdOPC)
                             {
+
                                 //Update status from opc to db
-                                int orderStatusOPC = opcClient.GetCurrentOrderStatus();
-                                dbClient.updateOrderStatus(orderStatusOPC, orderIdDb);
+                                // int orderStatusOPC = opcClient.GetCurrentOrderStatus();
+
+                                List<OrderUserDTO> ordersUserDTO = opcClient.GetCurrentOrderStatuses();
+                                dbClient.updateOrderStatus(ordersUserDTO.First().order, orderIdDb);
+                                //update status on outside API
+                                //OrderUserDTO orderUserDTO = new OrderUserDTO()
+                                //{
+                                //    order = 247,
+                                //    robot = 1,
+                                //    status_drink = 15,
+                                //    drink = 385
+                                //    // status_drink = 
+                                //    // drink = 
+                                //    // ingredient = 
+                                //};
+                                //todo populate orderUserDTO
+                                foreach (var order in ordersUserDTO)
+                                {
+                                    if (ChangeStatusDetected(order, orderDb))
+                                    {
+                                       // dbClient.updateDrinkStatus(order);
+                                        UpdateUserAPI(order);
+                                    }
+                                }
+                                
+
                             } else
                             {
                                 //this order has been completed. Update OPC with a new order
-                                opcClient.writeNewOrder(order);
+                                opcClient.writeNewOrder(orderDb);
                             }
                         } else 
                         {
                             //OPC is not processing any orders.
                             //TODO - Update OPC with a new order
-                            opcClient.writeNewOrder(order);
+                            opcClient.writeNewOrder(orderDb);
                         }
                     } else
                     {
@@ -129,6 +156,30 @@ namespace OPCtoMongoDBService.Workers
                 //throw;
             }
 
+        }
+
+        private bool ChangeStatusDetected(OrderUserDTO order, Order orderDb)
+        {
+            //find the drink and check if status is changed
+            foreach (var product in orderDb.products)
+            {
+                if (product.id == order.drink)
+                {
+                    //found the drink, now compare statuses
+                    if (product.status != order.status_drink)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void UpdateUserAPI(OrderUserDTO orderUserDTO)
+        {
+            string json = JsonConvert.SerializeObject(orderUserDTO);
+            UserAPIService userAPIService = new UserAPIService();
+            var updateSuccess = userAPIService.UpdateOrder(json);
         }
 
         bool checkConditions()

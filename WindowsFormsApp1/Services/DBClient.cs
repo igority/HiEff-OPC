@@ -91,7 +91,7 @@ namespace OPCtoMongoDBService.Services
             var filter = new BsonDocument("status", new BsonDocument("$ne", 20));
 
             //db.products.find().sort({ "created_at": 1})
-            var results = collection.Find(filter).SortBy(bson => bson["creation_date"]).Limit(100).ToList();
+            var results = collection.Find(filter).SortByDescending(bson => bson["priority"]).ThenBy(bson => bson["creation_date"]).Limit(100).ToList();
             if (results.Count > 0)
             {
                 foreach (var result in results)
@@ -132,6 +132,16 @@ namespace OPCtoMongoDBService.Services
             //  .Set("output_random", testOutput.output_random);
             //var update = Builders<BsonDocument>.Update.Set("order_status", order.order_status);
             var result = collection.UpdateMany(filter, update);
+        }
+
+        internal void updateDrinkStatus(OrderUserDTO order)
+        {
+            //TODO
+            //var collection = _database.GetCollection<BsonDocument>("Orders");
+            //var filter = Builders<BsonDocument>.Filter.Eq("id", orderIdDb);
+            //var update = Builders<BsonDocument>.Update.Set("status", orderStatusOPC);
+
+            //var result = collection.UpdateOne(filter, update);
         }
 
         public void updatePLCInput(PLCInput plcInput)

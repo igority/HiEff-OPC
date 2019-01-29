@@ -90,6 +90,39 @@ namespace OPCtoMongoDBService.Services
             return GetInt32Value("ORDER_STATUS");
         }
 
+        internal List<OrderUserDTO> GetCurrentOrderStatuses()
+        {
+            //we get all for now, and update them all regardless of change
+            // TODO - detect change and update only if there is actual change
+            int totalDrinks = 4;
+            var orders = new List<OrderUserDTO>();
+            for (int drinkIndex = 1; drinkIndex <= totalDrinks; drinkIndex++)
+            {
+                int drinkID = GetInt32Value("DRINK_" + drinkIndex + "_ID");
+                if (drinkID != 0)
+                {
+                    var order = new OrderUserDTO();
+                    order.order = GetInt32Value("ORDER_ID");
+                    order.drink = drinkID;
+                    order.status_drink = GetInt32Value("DRINK_" + drinkIndex + "_STATUS");
+                    order.robot = 1;
+                    //todo logic for ingredient and later for garnish
+                    orders.Add(order);
+                }
+            }
+            return orders;
+            //OrderUserDTO orderUserDTO = new OrderUserDTO()
+            //{
+            //    order = 247,
+            //    robot = 1,
+            //    status_drink = 15,
+            //    drink = 385
+            //    // status_drink = 
+            //    // drink = 
+            //    // ingredient = 
+            //};
+        }
+
         public int GetCurrentOrderId()
         {
             return GetInt32Value("ORDER_ID");
