@@ -119,8 +119,15 @@ namespace OPCtoMongoDBService.Services
             var collection = _database.GetCollection<BsonDocument>("Orders");
             var filter = Builders<BsonDocument>.Filter.Eq("id", orderIdDb);
             var update = Builders<BsonDocument>.Update.Set("status", orderStatusOPC);
+            try
+            {
+                var result = collection.UpdateOne(filter, update);
+            }
+            catch (Exception ex)
+            {
 
-            var result = collection.UpdateOne(filter, update);
+                throw ex;
+            }
         }
 
         public void updatePLCOutput(PLCOutput plcOutput)
@@ -134,14 +141,35 @@ namespace OPCtoMongoDBService.Services
             var result = collection.UpdateMany(filter, update);
         }
 
-        internal void updateDrinkStatus(OrderUserDTO order)
+        internal UpdateResult updateDrinkStatus(OrderUserDTO order)
         {
             //TODO
-            //var collection = _database.GetCollection<BsonDocument>("Orders");
-            //var filter = Builders<BsonDocument>.Filter.Eq("id", orderIdDb);
-            //var update = Builders<BsonDocument>.Update.Set("status", orderStatusOPC);
-
-            //var result = collection.UpdateOne(filter, update);
+            var collection = _database.GetCollection<BsonDocument>("Orders");
+            //var filter = Builders<Order>
+            //    .Filter
+            //    .Where(x => x.id == order.order);
+            //var update = Builders<Order>
+            //    .Update
+            //    .Set(x => x.products[0].status, order.status_drink);
+            var filter = new BsonDocument("id", new BsonDocument("$eq", order.order));
+            // var filter = Builders<Order>.Filter.Eq("id", order.order);
+            var ordersDb = collection.Find(filter).ToList();
+            if (ordersDb.Count() > 0)
+            {
+                var products = ordersDb.First()["products"].AsBsonArray;
+                products[0]["status"] = order.status_drink;
+                var update = Builders<BsonDocument>.Update.Set("products", products);
+                try
+                {
+                    var result = collection.UpdateOne(filter, update);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return null;
         }
 
         public void updatePLCInput(PLCInput plcInput)

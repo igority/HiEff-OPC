@@ -85,6 +85,20 @@ namespace OPCtoMongoDBService.Helpers
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ID.VALUE"));
             OUTPUT_TAGS.Add(new Tag(++index, "ORDER_STATUS",
                         "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.ISTATUS.VALUE"));
+
+            for (int drinkIndex = 1; drinkIndex <= totalDrinks; drinkIndex++)
+            {
+                OUTPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_ID",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ID.VALUE"));
+                OUTPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_ICE",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IICE.VALUE"));
+                OUTPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_PREP",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IPREP.VALUE"));
+                OUTPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_QUANTITY",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".IQUANTITY.VALUE"));
+                OUTPUT_TAGS.Add(new Tag(++index, "DRINK_" + drinkIndex + "_STATUS",
+                    "AB:RYAN_HIEFFICIENCYBAR:ST_ORDER:OPC_ORDER.STDRINK_" + drinkIndex + ".ISTATUS.VALUE"));
+            }
         }
     }
 }

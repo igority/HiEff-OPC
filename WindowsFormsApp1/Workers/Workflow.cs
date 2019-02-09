@@ -119,7 +119,7 @@ namespace OPCtoMongoDBService.Workers
                                 {
                                     if (ChangeStatusDetected(order, orderDb))
                                     {
-                                       // dbClient.updateDrinkStatus(order);
+                                        dbClient.updateDrinkStatus(order);
                                         UpdateUserAPI(order);
                                     }
                                 }
